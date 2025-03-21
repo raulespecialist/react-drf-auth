@@ -223,9 +223,9 @@ El propósito de este frontend es proporcionar una interfaz de usuario para:
 
 1.  **Clonar el repositorio**:
     
-    git clone https://github.com/tu-usuario/tu-repositorio.git
+    git clone https://github.com/raulespecialist/react-drf-auth.git
     
-    cd tu-repositorio/frontend
+    cd react-drf-auth
     
 2.  **Instalar dependencias**:
     
