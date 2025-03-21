@@ -1,70 +1,265 @@
-# Getting Started with Create React App
+# **Frontend - Autenticación con React**
 
-This project was bootstrapped with [Create React App](https://github.com/facebook/create-react-app).
+Este proyecto es un frontend desarrollado en React que consume una API de Django para implementar un sistema de autenticación de usuarios con autenticación de dos factores (2FA) utilizando Google Authenticator.
 
-## Available Scripts
+----------
 
-In the project directory, you can run:
+## **Propósito**
 
-### `npm start`
+El propósito de este frontend es proporcionar una interfaz de usuario para:
 
-Runs the app in the development mode.\
-Open [http://localhost:3000](http://localhost:3000) to view it in your browser.
+1.  **Registro de usuarios**.
+    
+2.  **Inicio de sesión**  con autenticación básica (usuario y contraseña).
+    
+3.  **Configuración de Google Authenticator**  para la autenticación de dos factores (2FA).
+    
+4.  **Verificación de códigos OTP**  generados por Google Authenticator.
+    
+5.  **Cierre de sesión**.
+    
 
-The page will reload when you make changes.\
-You may also see any lint errors in the console.
+----------
 
-### `npm test`
+## **Librerías Utilizadas**
 
-Launches the test runner in the interactive watch mode.\
-See the section about [running tests](https://facebook.github.io/create-react-app/docs/running-tests) for more information.
+-   **React**: Biblioteca principal para el desarrollo de la interfaz de usuario.
+    
+-   **React Router DOM**: Para manejar la navegación entre páginas.
+    
+-   **Axios**: Para hacer solicitudes HTTP a la API de Django.
+    
+-   **Bootstrap 5**: Para el diseño y la estilización de la interfaz.
+    
+-   **Bootswatch (Tema Minty)**: Para aplicar un tema visual personalizado a Bootstrap.
+    
 
-### `npm run build`
+----------
 
-Builds the app for production to the `build` folder.\
-It correctly bundles React in production mode and optimizes the build for the best performance.
+## **Endpoints Consumidos**
 
-The build is minified and the filenames include the hashes.\
-Your app is ready to be deployed!
+### **1. Registro de Usuarios**
 
-See the section about [deployment](https://facebook.github.io/create-react-app/docs/deployment) for more information.
+-   **Método**:  `POST`
+    
+-   **URL**:  `/api/register/`
+    
+-   **Descripción**: Permite a los usuarios registrarse en la aplicación.
+    
+-   **Restricciones**:
+    
+    -   El nombre de usuario y el correo electrónico deben ser únicos.
+        
+    -   La contraseña debe tener al menos 8 caracteres.
+        
+-   **Modelo de Negocio**:
+    
+    -   Envía los datos del formulario de registro a la API.
+        
+    -   Redirige al usuario a la página de inicio de sesión después de un registro exitoso.
+        
 
-### `npm run eject`
+----------
 
-**Note: this is a one-way operation. Once you `eject`, you can't go back!**
+### **2. Inicio de Sesión**
 
-If you aren't satisfied with the build tool and configuration choices, you can `eject` at any time. This command will remove the single build dependency from your project.
+-   **Método**:  `POST`
+    
+-   **URL**:  `/api/login/`
+    
+-   **Descripción**: Permite a los usuarios iniciar sesión con su nombre de usuario y contraseña.
+    
+-   **Restricciones**:
+    
+    -   El usuario debe estar registrado.
+        
+    -   Las credenciales deben ser válidas.
+        
+-   **Modelo de Negocio**:
+    
+    -   Envía las credenciales del usuario a la API.
+        
+    -   Almacena el token de autenticación en  `localStorage`.
+        
+    -   Redirige al usuario a  `/qr`  si no tiene un secreto de Google Authenticator configurado.
+        
+    -   Redirige al usuario a  `/verify-otp`  si ya tiene un secreto configurado.
+        
 
-Instead, it will copy all the configuration files and the transitive dependencies (webpack, Babel, ESLint, etc) right into your project so you have full control over them. All of the commands except `eject` will still work, but they will point to the copied scripts so you can tweak them. At this point you're on your own.
+----------
 
-You don't have to ever use `eject`. The curated feature set is suitable for small and middle deployments, and you shouldn't feel obligated to use this feature. However we understand that this tool wouldn't be useful if you couldn't customize it when you are ready for it.
+### **3. Generación de Código QR para Google Authenticator**
 
-## Learn More
+-   **Método**:  `GET`
+    
+-   **URL**:  `/api/generate-qr/`
+    
+-   **Descripción**: Genera un código QR que el usuario puede escanear con Google Authenticator.
+    
+-   **Restricciones**:
+    
+    -   El usuario debe estar autenticado.
+        
+    -   El usuario no debe tener un secreto de Google Authenticator configurado previamente.
+        
+-   **Modelo de Negocio**:
+    
+    -   Solicita el código QR a la API.
+        
+    -   Muestra el código QR en la interfaz para que el usuario lo escanee.
+        
 
-You can learn more in the [Create React App documentation](https://facebook.github.io/create-react-app/docs/getting-started).
+----------
 
-To learn React, check out the [React documentation](https://reactjs.org/).
+### **4. Verificación de Código OTP**
 
-### Code Splitting
+-   **Método**:  `POST`
+    
+-   **URL**:  `/api/verify-otp/`
+    
+-   **Descripción**: Verifica el código OTP ingresado por el usuario.
+    
+-   **Restricciones**:
+    
+    -   El usuario debe estar autenticado.
+        
+    -   El usuario debe tener un secreto de Google Authenticator configurado.
+        
+-   **Modelo de Negocio**:
+    
+    -   Envía el código OTP ingresado por el usuario a la API.
+        
+    -   Redirige al usuario a la página principal (`/dashboard`) si el código es válido.
+        
 
-This section has moved here: [https://facebook.github.io/create-react-app/docs/code-splitting](https://facebook.github.io/create-react-app/docs/code-splitting)
+----------
 
-### Analyzing the Bundle Size
+### **5. Cierre de Sesión**
 
-This section has moved here: [https://facebook.github.io/create-react-app/docs/analyzing-the-bundle-size](https://facebook.github.io/create-react-app/docs/analyzing-the-bundle-size)
+-   **Método**:  `POST`
+    
+-   **URL**:  `/api/logout/`
+    
+-   **Descripción**: Permite a los usuarios cerrar sesión.
+    
+-   **Restricciones**:
+    
+    -   El usuario debe estar autenticado.
+        
+-   **Modelo de Negocio**:
+    
+    -   Elimina el token de autenticación del  `localStorage`.
+        
+    -   Redirige al usuario a la página de inicio de sesión.
+        
 
-### Making a Progressive Web App
+----------
 
-This section has moved here: [https://facebook.github.io/create-react-app/docs/making-a-progressive-web-app](https://facebook.github.io/create-react-app/docs/making-a-progressive-web-app)
+## **Componentes Principales**
 
-### Advanced Configuration
+### **1. Registro (`Register`)**
 
-This section has moved here: [https://facebook.github.io/create-react-app/docs/advanced-configuration](https://facebook.github.io/create-react-app/docs/advanced-configuration)
+-   **Descripción**: Componente que permite a los usuarios registrarse en la aplicación.
+    
+-   **Funcionalidades**:
+    
+    -   Formulario de registro con campos para nombre de usuario, correo electrónico y contraseña.
+        
+    -   Validación de campos y envío de datos a la API.
+        
 
-### Deployment
+### **2. Inicio de Sesión (`Login`)**
 
-This section has moved here: [https://facebook.github.io/create-react-app/docs/deployment](https://facebook.github.io/create-react-app/docs/deployment)
+-   **Descripción**: Componente que permite a los usuarios iniciar sesión.
+    
+-   **Funcionalidades**:
+    
+    -   Formulario de inicio de sesión con campos para nombre de usuario y contraseña.
+        
+    -   Validación de credenciales y envío de datos a la API.
+        
 
-### `npm run build` fails to minify
+### **3. Generación de Código QR (`QRCode`)**
 
-This section has moved here: [https://facebook.github.io/create-react-app/docs/troubleshooting#npm-run-build-fails-to-minify](https://facebook.github.io/create-react-app/docs/troubleshooting#npm-run-build-fails-to-minify)
+-   **Descripción**: Componente que muestra un código QR para configurar Google Authenticator.
+    
+-   **Funcionalidades**:
+    
+    -   Solicita y muestra el código QR generado por la API.
+        
+
+### **4. Verificación de Código OTP (`VerifyOTP`)**
+
+-   **Descripción**: Componente que permite a los usuarios verificar su código OTP.
+    
+-   **Funcionalidades**:
+    
+    -   Formulario para ingresar el código OTP.
+        
+    -   Envío del código OTP a la API para su verificación.
+        
+
+### **5. Cierre de Sesión (`Logout`)**
+
+-   **Descripción**: Componente que permite a los usuarios cerrar sesión.
+    
+-   **Funcionalidades**:
+    
+    -   Elimina el token de autenticación y redirige al usuario a la página de inicio de sesión.
+        
+
+### **6. Barra de Navegación (`Navbar`)**
+
+-   **Descripción**: Componente que muestra la barra de navegación.
+    
+-   **Funcionalidades**:
+    
+    -   Muestra enlaces dinámicos según el estado de autenticación del usuario.
+        
+
+----------
+
+## **Instalación y Ejecución**
+
+1.  **Clonar el repositorio**:
+    
+    git clone https://github.com/tu-usuario/tu-repositorio.git
+    
+    cd tu-repositorio/frontend
+    
+2.  **Instalar dependencias**:
+    
+    npm install
+    
+3.  **Ejecutar la aplicación**:
+    
+    
+    npm start
+    
+
+----------
+
+## **Contribuciones**
+
+Si deseas contribuir a este proyecto, sigue estos pasos:
+
+1.  Haz un fork del repositorio.
+    
+2.  Crea una rama para tu contribución (`git checkout -b feature/nueva-funcionalidad`).
+    
+3.  Realiza tus cambios y haz commit (`git commit -m 'Añadir nueva funcionalidad'`).
+    
+4.  Haz push a la rama (`git push origin feature/nueva-funcionalidad`).
+    
+5.  Abre un pull request.
+    
+
+----------
+
+## **Licencia**
+
+Este proyecto está bajo la licencia MIT. Para más detalles, consulta el archivo  [LICENSE](https://license/).
+
+----------
+
+¡Gracias por usar este frontend! Si tienes alguna pregunta o sugerencia, no dudes en contactarme. 😊
